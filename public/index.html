@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>查詢胡蘿蔔價格</title>
+</head>
+<body>
+<h1>查詢胡蘿蔔價格</h1>
+<form id="queryForm">
+  <label for="date">日期 (YYYY-MM):</label>
+  <input type="text" id="date" name="date" placeholder="2019-05~2024-05" pattern="\d{4}-\d{2}">
+  <br><br>
+  <button type="submit">查詢</button>
+</form>
+<button id="showAllButton">顯示全部資料</button>
+<h2>結果</h2>
+<div id="result"></div>
+
+<script>
+  document.getElementById('queryForm').addEventListener('submit', async function(event) {
+    event.preventDefault();
+    const date = document.getElementById('date').value;
+    const response = await fetch(`/query?date=${date}&showAll=false`);
+    const data = await response.json();
+    const resultDiv = document.getElementById('result');
+    if (data.length === 0) {
+      resultDiv.textContent = '找不到資料。';
+    } else {
+      const price = `當日價格為 $${data[0].price}`;
+      resultDiv.innerHTML = price;
+    }
+  });
+
+  document.getElementById('showAllButton').addEventListener('click', async function() {
+    const response = await fetch(`/query?showAll=true`);
+    const data = await response.json();
+    const resultDiv = document.getElementById('result');
+    if (data.length === 0) {
+      resultDiv.textContent = '找不到資料。';
+    } else {
+      const prices = data.map(item => `${item.date}: $${item.price}`).join('<br>');
+      resultDiv.innerHTML = prices;
+    }
+  });
+</script>
+</body>
+</html>
